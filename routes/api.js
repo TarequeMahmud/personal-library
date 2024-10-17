@@ -50,7 +50,13 @@ module.exports = function (app) {
       }
     })
 
-    .delete(function (req, res) {
+    .delete(async function (req, res) {
+      try {
+        await Book.deleteMany({});
+        return res.json("complete delete successful");
+      } catch (error) {
+        console.error(error);
+      }
       //if successful response will be 'complete delete successful'
     });
 
