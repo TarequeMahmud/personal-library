@@ -90,7 +90,7 @@ suite("Functional Tests", function () {
             assert.equal(res.status, 200);
             assert.isArray(res.body, "response should be an array");
             res.body.forEach((element) => {
-              assert.isObject(element, "elements should be objects");
+              assert.isObject(element, "element should be object");
             });
             done();
           });
@@ -105,7 +105,7 @@ suite("Functional Tests", function () {
           .end(function (err, res) {
             assert.equal(res.status, 200);
 
-            assert.isString(res.body, "elements should be objects");
+            assert.isString(res.body, "element should be string");
             assert.equal(res.body, "no book exists");
 
             done();
@@ -119,24 +119,62 @@ suite("Functional Tests", function () {
           .end(function (err, res) {
             assert.equal(res.status, 200);
 
-            assert.isObject(res.body, "elements should be objects");
+            assert.isObject(res.body, "element should be object");
             assert.equal(res.body._id, "67113134ca6cd445df2465a0");
 
             done();
           });
       });
     });
-    //   suite('POST /api/books/[id] => add comment/expect book object with id', function(){
-    //     test('Test POST /api/books/[id] with comment', function(done){
-    //       //done();
-    //     });
-    //     test('Test POST /api/books/[id] without comment field', function(done){
-    //       //done();
-    //     });
-    //     test('Test POST /api/books/[id] with comment, id not in db', function(done){
-    //       //done();
-    //     });
-    //   });
+    suite(
+      "POST /api/books/[id] => add comment/expect book object with id",
+      function () {
+        test("Test POST /api/books/[id] with comment", function (done) {
+          chai
+            .request(server)
+            .keepOpen()
+            .post("/api/books/67113134ca6cd445df2465a0")
+            .send({ comment: "first comment" })
+            .end(function (err, res) {
+              assert.equal(res.status, 200);
+
+              assert.isObject(res.body, "elements should be objects");
+              assert.equal(res.body._id, "67113134ca6cd445df2465a0");
+              assert.isArray(res.body.comments, "comment should be array");
+              assert.include(res.body.comments, "first comment");
+              done();
+            });
+        });
+        test("Test POST /api/books/[id] without comment field", function (done) {
+          chai
+            .request(server)
+            .keepOpen()
+            .post("/api/books/67113134ca6cd445df2465a0")
+            .send({})
+            .end(function (err, res) {
+              assert.equal(res.status, 200);
+
+              assert.isString(res.body, "element should be string");
+              assert.equal(res.body, "missing required field comment");
+              done();
+            });
+        });
+        test("Test POST /api/books/[id] with comment, id not in db", function (done) {
+          chai
+            .request(server)
+            .keepOpen()
+            .post("/api/books/67113134c16cd445df2465a0")
+            .send({ comment: "first comment" })
+            .end(function (err, res) {
+              assert.equal(res.status, 200);
+
+              assert.isString(res.body, "element should be string");
+              assert.equal(res.body, "no book exists");
+              done();
+            });
+        });
+      }
+    );
     //   suite('DELETE /api/books/[id] => delete book object id', function() {
     //     test('Test DELETE /api/books/[id] with valid id in db', function(done){
     //       //done();
