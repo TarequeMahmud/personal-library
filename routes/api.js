@@ -31,7 +31,9 @@ module.exports = function (app) {
           };
         });
         return res.json(data);
-      } catch (error) {}
+      } catch (error) {
+        console.error(error);
+      }
       //response will be array of book objects
       //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
     })
@@ -96,8 +98,14 @@ module.exports = function (app) {
       console.error(error);
     })
 
-    .delete(function (req, res) {
+    .delete(async function (req, res) {
       let bookid = req.params.id;
-      //if successful response will be 'delete successful'
+      try {
+        const deleteBook = await Book.findByIdAndDelete(bookid);
+        if (!deleteBook) return res.json("no book exists");
+        return res.json("delete successful");
+      } catch (error) {
+        console.error(error);
+      }
     });
 };
