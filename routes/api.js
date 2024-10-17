@@ -19,7 +19,19 @@ const Book = mongoose.model("Book", bookSchema);
 module.exports = function (app) {
   app
     .route("/api/books")
-    .get(function (req, res) {
+    .get(async function (req, res) {
+      try {
+        const books = await Book.find();
+        if (books.length === 0) return res.json("no book exists");
+        const data = books.map((book) => {
+          return {
+            _id: book._id,
+            title: book.title,
+            commentcount: book.comments.length,
+          };
+        });
+        return res.json(data);
+      } catch (error) {}
       //response will be array of book objects
       //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
     })
